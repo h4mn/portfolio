@@ -1,0 +1,145 @@
+@font-face {
+	font-family:'Open Sans';
+	src:url('//mozorg.cdn.mozilla.net/media/fonts/OpenSans-Regular-webfont.eot');
+	src:url('//mozorg.cdn.mozilla.net/media/fonts/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),url('//mozorg.cdn.mozilla.net/media/fonts/OpenSans-Regular-webfont.woff') format('woff'),url('//mozorg.cdn.mozilla.net/media/fonts/OpenSans-Regular-webfont.ttf') format('truetype'),url('//mozorg.cdn.mozilla.net/media/fonts/OpenSans-Regular-webfont.svg#svgFontName') format('svg')
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Open sans",HelveticaNeue,Helvetica,Arial,Sans-serif;
+}
+.navbar {
+    margin-bottom: 0;
+    background-color: #2d2d30;
+    border: 0;
+    font-size: 11px !important;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+.navbar li a, .navbar .navbar-brand {
+    text-transform: uppercase;
+    color: #d5d5d5 !important;
+}
+.navbar-nav li a:hover {
+    color: #fff !important;
+}
+.navbar-nav li.active a {
+    color: #fff !important;
+    background-color: #19191c !important;
+}
+.portrait-me img {
+    -webkit-filter: grayscale(90%);
+    filter: grayscale(90%);
+}
+.brand-me-1 {
+    color: #666 !important;
+}
+.brand-me-2 {
+    color: #900 !important;
+}
+.brand-me-3 {
+    color: #ccc !important;
+}
+.bg-4 {
+    margin-top: 30px;
+    padding: 10px;
+    background-color: #2f2f2f;
+    color: #ccc;
+}
+.theme-brand {
+    width: 35px;
+    vertical-align: -12px;
+}
+.profile-me tbody tr td i {
+    font-size: 24px;
+}.profile-me tbody tr td em {
+    font-size: 13px;
+}
+.list-group-item h4 small {
+    float: right;
+}
+.skill-rate {
+    display: block;
+    float: right;
+    height: 32px !important;
+    min-width: 32px !important;
+}
+.skill-rate-1 {
+    width: 32px !important;
+}
+.skill-rate-2 {
+    width: 64px !important;
+}
+.skill-rate-3 {
+    width: 96px !important;
+}
+.skill-rate-4 {
+    width: 128px !important;
+}
+.skill-rate-5 {
+    width: 160px !important;
+}
+.skill-rate-html {
+    background-image: url(https://www.w3.org/html/logo/downloads/HTML5_Logo_32.png);
+}
+.skill-rate-css {
+    background-image: url(/img/css3.png);
+}
+.skill-rate-js {
+    background-image: url(/img/js.png);
+}
+.skill-rate-php {
+    background-image: url(http://br2.php.net/images/logos/php-icon-white.gif);
+}
+.skill-rate-mysql {
+    background-image: url(/img/mysql-logo-32.jpg);
+}
+.skill-rate-jquery {
+    background-image: url(/img/jquery-logo-32.png);
+}
+.skill-rate-joomla {
+    background-image: url(/img/joomla-logo-32.gif);
+}
+.skill-rate-cakephp {
+    background-image: url(/img/cakephp-logo-32.ico);
+}
+.skill-rate-wordpress {
+    background-image: url(/img/wordpress-logo-32.png);
+}
+.skill-rate-bootstrap {
+    background-image: url(/img/bootstrap-logo-32.png);
+}
+.skill-rate-linux {
+    background-image: url(/img/linux-logo-32.png);
+}
+.skill-rate-github {
+    background-image: url(/img/github-logo-32.png);
+}
+.skill-rate-dotnet {
+    background-image: url(/img/dotnet-logo-32.png);
+}
+.skill-rate-vba {
+    background-image: url(/img/vba-logo-32.png);
+}
+.skill-rate-photoshop {
+    background-image: url(/img/photoshop-logo-32.png);
+}
+.skill-rate-netbeans {
+    background-image: url(/img/netbeans-logo-32.png);
+}
+.skill-rate-lol {
+    background-image: url(/img/lol-logo-32.png);
+}
+.modal-lg {
+    width: 1180px !important;
+}
+.modal-body {
+    aadisplay: inline;
+}
+.dl-curriculo {
+    background-image: url(/img/microsoft-word-1.jpg);
+    background-size: 40px;
+    background-repeat:no-repeat;
+    background-position: 10px 10px;
+    width: 296px;
+}
