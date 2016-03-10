@@ -13,7 +13,14 @@ class mcv {
     private $activeView;
     private $globalNotice;
     function renderize () {
-        if ($this->controller() == "face") {
+        if ($this->controller() == "jobs") {
+            require('portfolio.php');
+            $portfolio = new portfolio();
+            $portfolio->mysql_conn_username = "portfolio";
+            $portfolio->mysql_conn_password = "workbench";
+            $this->activeView = $portfolio->visao_teste();
+            $portfolio->dbConnectionClose();
+        } else if ($this->controller() == "face") {
             header('Location: http://'.$this->views[$this->controller()]);
         } else if ($this->controller() == "processa-velha") {
             require('desafioProcessa.php');            
