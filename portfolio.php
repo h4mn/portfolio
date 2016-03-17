@@ -24,6 +24,52 @@ class portfolio {
     public $mysql_conn_dbname = 'portfolio';
     public $msg_erro;
     public $mysql_table = 'jobs';
+    private $table_open = <<<END
+
+    <table class="table table-striped">
+    	<tbody>
+END;
+    private $table_close = <<<END
+
+        </tbody>
+    </table>
+END;
+    private $line_open = <<<END
+
+        	<tr>
+END;
+    private $line_close = <<<END
+
+        	</tr>
+END;
+    private $thumb = <<<END
+
+            	<td class="col-sm-6 [text-align]">
+                    <div class="col-thumb-container">
+                        <img src="[img]" />
+                    </div>
+                </td>
+END;
+    private $desc = <<<END
+
+            	<td class="col-sm-6 [text-align]">
+                    <div class="col-desc-container">
+                        <h1 class="col-desc-title">
+                            [titulo]
+                            <small class="col-desc-subtitle">[subtitulo]</small>
+                        </h1>
+                        <p class="col-desc-body">[desc]</p>
+                        <button data-toggle="collapse" data-target="#detalhes">Detalhes</button>
+                        <div id="detalhes" class="collapse">
+                        	<p class="col-desc-deteails-client">[cliente]</p>
+                        	<p class="col-desc-deteails-client">[data]</p>
+                        	<p class="col-desc-deteails-client">[tecnologias]</p>
+                        	<p class="col-desc-deteails-client">[fonte]</p>
+                        </div>
+                    </div>
+                </td>
+END;
+
 //funções de dados
 /*
  * acessar db
@@ -98,4 +144,39 @@ class portfolio {
         $retorno = $retorno . '</table>';
         return $retorno;
     }
+    public function visao () {
+        $visao = $this->table_open;
+        $jobs = $this->Jobs();
+        while ($linha = mysql_fetch_assoc($jobs)) {
+            $paridade += 1;
+            $visao .= $this->line_open;
+            $campos = array("[titulo]", "[subtitulo]", "[desc]", "[cliente]", "[data]", "[tecnologias]", "[fonte]");
+            $dados = array($linha['jobsname'], $linha['jobsname'], utf8_encode($linha['jobsdesc']), $linha['jobsclient'], $linha['jobsdateinit'], $linha['jobsusedtechs'], $linha['jobsname']);
+            if ($paridade % 2 == 0) {
+                $desc = str_replace('[text-align]', 'text-right', $this->desc);
+                $visao .= str_replace($campos, $dados, $desc);
+                $visao .= str_replace("[img]", "{$linha['jobsfilepreviewportmini']}", $this->thumb);
+            } else {
+                $thumb = str_replace('[text-align]', 'text-right', $this->thumb);
+                $visao .= str_replace("[img]", "{$linha['jobsfilepreviewportmini']}", $thumb);
+                $visao .= str_replace($campos, $dados, $this->desc);
+            }
+            $visao .= $this->line_close;
+        }
+        $visao .= $this->table_close;
+        return $visao;
+    }
 }
+
+/**
+ * Testes
+
+$portfolio = new portfolio();
+$portfolio->mysql_conn_username = "portfolio";
+$portfolio->mysql_conn_password = "workbench";
+echo $portfolio->visao();
+$portfolio->dbConnectionClose();
+die();
+
+ * 
+ */

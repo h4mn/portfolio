@@ -18,7 +18,7 @@ class mcv {
             $portfolio = new portfolio();
             $portfolio->mysql_conn_username = "portfolio";
             $portfolio->mysql_conn_password = "workbench";
-            $this->activeView = $portfolio->visao_teste();
+            $this->activeView = $portfolio->visao();
             $portfolio->dbConnectionClose();
         } else if ($this->controller() == "face") {
             header('Location: http://'.$this->views[$this->controller()]);
