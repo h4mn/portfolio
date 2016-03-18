@@ -45,26 +45,49 @@ END;
     private $thumb = <<<END
 
             	<td class="col-sm-6 [text-align]">
-                    <div class="col-thumb-container">
-                        <img src="[img]" />
-                    </div>
+                    <img class="img-thumbnail" src="[img]">
+                    <p>
+                        URL do Site:
+                        <a href="[site-url]" class="label label-default">[site-url]</a>
+                    </p>
                 </td>
 END;
     private $desc = <<<END
 
             	<td class="col-sm-6 [text-align]">
                     <div class="col-desc-container">
-                        <h1 class="col-desc-title">
-                            [titulo]
-                            <small class="col-desc-subtitle">[subtitulo]</small>
-                        </h1>
-                        <p class="col-desc-body">[desc]</p>
-                        <button data-toggle="collapse" data-target="#detalhes">Detalhes</button>
-                        <div id="detalhes" class="collapse">
-                        	<p class="col-desc-deteails-client">[cliente]</p>
-                        	<p class="col-desc-deteails-client">[data]</p>
-                        	<p class="col-desc-deteails-client">[tecnologias]</p>
-                        	<p class="col-desc-deteails-client">[fonte]</p>
+                        <div class="btn btn-default btn-block [text-align]" data-toggle="collapse" data-target="#detalhes-[jobid]">
+                            <h1 class="col-desc-title [text-align]">
+                                [titulo]
+                                <small class="col-desc-subtitle">[subtitulo]</small>
+                            </h1>
+                            <p class="col-desc-body [text-align]">[desc]</p>
+                            <div id="detalhes-[jobid]" class="collapse panel panel-default">
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tr class="row">
+                                            <td class="col-sm-4 text-right">Cliente:</td>
+                                            <td class="col-sm-8 text-left">[cliente]</td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-4 text-right">Data do projeto:</td>
+                                            <td class="col-sm-8 text-left">[data]</td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-4 text-right">Tecnologias utilizadas:</td>
+                                            <td class="col-sm-8 text-left">
+                                                <strong>[tecnologias]</strong>
+                                            </td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-4 text-right">Código fonte:</td>
+                                            <td class="col-sm-8 text-left">
+                                                <a href="[fonte]">[fonte]</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -151,15 +174,27 @@ END;
             $paridade += 1;
             $visao .= $this->line_open;
             $campos = array("[titulo]", "[subtitulo]", "[desc]", "[cliente]", "[data]", "[tecnologias]", "[fonte]");
-            $dados = array($linha['jobsname'], $linha['jobsname'], utf8_encode($linha['jobsdesc']), $linha['jobsclient'], $linha['jobsdateinit'], $linha['jobsusedtechs'], $linha['jobsname']);
+            $dados = array(
+                utf8_encode($linha['jobsname']),
+                utf8_encode($linha['jobsnameaka']),
+                utf8_encode($linha['jobsdesc']),
+                utf8_encode($linha['jobsclient']),
+                date('d/m/Y', strtotime($linha['jobsdateinit'])),
+                $linha['jobsusedtechs'],
+                $linha['jobsurlsource']
+            );
+            $thumb_campos = array("[img]", "[site-url]");
+            $thumb_dados = array($linha['jobsfilepreviewportmini'], $linha['jobsurlsite']);
+            $desc_id = str_replace('[jobid]', $linha['idjobs'], $this->desc);
             if ($paridade % 2 == 0) {
-                $desc = str_replace('[text-align]', 'text-right', $this->desc);
-                $visao .= str_replace($campos, $dados, $desc);
-                $visao .= str_replace("[img]", "{$linha['jobsfilepreviewportmini']}", $this->thumb);
+                $desc_align = str_replace('[text-align]', 'text-right', $desc_id);
+                $visao .= str_replace($campos, $dados, $desc_align);
+                $visao .= str_replace($thumb_campos, $thumb_dados, $this->thumb);
             } else {
                 $thumb = str_replace('[text-align]', 'text-right', $this->thumb);
-                $visao .= str_replace("[img]", "{$linha['jobsfilepreviewportmini']}", $thumb);
-                $visao .= str_replace($campos, $dados, $this->desc);
+                $visao .= str_replace($thumb_campos, $thumb_dados, $thumb);
+                $desc_align = str_replace('[text-align]', 'text-left', $desc_id);
+                $visao .= str_replace($campos, $dados, $desc_align);
             }
             $visao .= $this->line_close;
         }

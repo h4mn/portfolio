@@ -27,15 +27,17 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `jobs` (
-  `idjobs` int(11) NOT NULL,
+  `idjobs` int(11) NOT NULL AUTO_INCREMENT,
   `jobsname` varchar(45) DEFAULT NULL,
-  `jobsclient` varchar(45) DEFAULT NULL,
+  `jobsnameaka` varchar(45) DEFAULT NULL,
   `jobsfilepreviewport` varchar(45) DEFAULT NULL,
   `jobsfilepreviewportmini` varchar(45) DEFAULT NULL,
   `jobsdesc` longtext,
+  `jobsclient` varchar(45) DEFAULT NULL,
   `jobsdateinit` timestamp NULL DEFAULT NULL,
   `jobsusedtechs` varchar(45) DEFAULT NULL,
   `jobsurlsource` varchar(45) DEFAULT NULL,
+  `jobsurlsite` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`idjobs`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
