@@ -24,6 +24,8 @@ class portfolio {
     public $msg_erro;
     public $mysql_table = 'jobs';
     private $mysql_initerror;
+    
+    private $variavel_do_vinny;
     private $table_open = <<<END
 
     <table class="table table-striped">
@@ -230,6 +232,13 @@ END;
             </ul>
         </div>
     </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading"><h4>Lição Programação nº2</h4></div>
+        <div class="panel-body">
+            <h4>$this->variavel_do_vinny</h4>
+            <p>Teste de alteração do repositório portfolio no GitHub</p>
+        </div>
+    </div>
 
 END;
         }
@@ -242,6 +251,10 @@ END;
 
         if ($controller == "jobs" && $action == "add") {
             
+        }
+
+        if ($controller == "jobs" && $action == "githubbing") {
+            $this->variavel_do_vinny = "Vinny esteve aqui e aprendeu a lição.";
         }
         
         return $controller;
