@@ -18,12 +18,12 @@ class portfolio {
  */
     private $mysql_conn_link = false;
     public $mysql_conn_server = '127.0.0.1';
-    public $mysql_conn_port = 3306;
     public $mysql_conn_username = 'user';
     public $mysql_conn_password = '***';
     public $mysql_conn_dbname = 'portfolio';
     public $msg_erro;
     public $mysql_table = 'jobs';
+    private $mysql_initerror;
     private $table_open = <<<END
 
     <table class="table table-striped">
@@ -47,7 +47,7 @@ END;
             	<td class="col-sm-6 [text-align]">
                     <img class="img-thumbnail" src="[img]">
                     <p>
-                        URL do Site:
+                        Site:
                         <a href="[site-url]" class="label label-default">[site-url]</a>
                     </p>
                 </td>
@@ -106,34 +106,36 @@ END;
         if ($this->mysql_conn_link) {
             return $this->mysql_conn_link;
         }
-        $this->mysql_conn_link = mysql_connect(
-                $this->mysql_conn_server.':'.$this->mysql_conn_port, 
+        
+        $this->mysql_conn_link = mysqli_connect(
+                $this->mysql_conn_server, 
                 $this->mysql_conn_username, 
                 $this->mysql_conn_password
-        ) or die('Erro de conexão MySQL');
-        //echo $this->mysql_conn_server.':'.$this->mysql_conn_port;
-        //exit;
-        mysql_selectdb($this->mysql_conn_dbname, $this->mysql_conn_link);
+        );
+        
+        mysqli_select_db($this->mysql_conn_link, $this->mysql_conn_dbname);
+
         return $this->mysql_conn_link;
     }
     public function dbConnectionClose () {
         if ($this->mysql_conn_link) {
-            mysql_close($this->mysql_conn_link);
+            mysqli_close($this->mysql_conn_link);
         }
         $this->mysql_conn_link = false;
     }
-    public function Jobs ($jobId = 'All') {
-        $this->dbConnection();
+    public function Jobs_old ($jobId = 'All') {
+        $link = $this->dbConnection();
         if ($jobId == 'All') {
-            $mysql_result = mysql_query("SELECT * FROM jobs;");
+            $mysql_result = mysqli_query($link, "SELECT * FROM jobs;");
         } else {
-            $mysql_result = mysql_query("SELECT * FROM jobs WHERE idjobs = `$jobId`;");
+            $mysql_result = mysqli_query($link, "SELECT * FROM jobs WHERE idjobs = `$jobId`;");
         }
         if (!$mysql_result) {
-            echo 'Erro SQL: '. mysql_error();
+            echo 'Erro SQL: '. mysqli_error($link);
             exit;
         }
-        if (mysql_num_rows($mysql_result) == 0) {
+
+        if (mysqli_num_rows($mysql_result) == 0) {
             echo 'Tabela de Jobs vazia';
             exit;
         }
@@ -149,28 +151,20 @@ END;
  * envia elemento
  * envia visão
  */
-    public function visao_teste () {
-        $retorno = '<table class="table table-stripped">';
-        $mysql_result = $this->Jobs();
-        while ($linha = mysql_fetch_assoc($mysql_result)) {
-            $retorno = $retorno . "<tr>";
-            $retorno = $retorno . "<td>{$linha['idjobs']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsname']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsclient']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsfilepreviewport']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsfilepreviewportmini']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsdesc']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsdateinit']}</td>";
-            $retorno = $retorno . "<td>{$linha['jobsusedtechs']}</td>";
-            $retorno = $retorno . "</tr>";
-        }
-        $retorno = $retorno . '</table>';
-        return $retorno;
-    }
+    
+    /**
+     * Função que envia a visão para a saida
+     * 
+     * @return visao
+     */
     public function visao () {
-        $visao = $this->table_open;
+        $visao = $this->admin();
+        $paridade = 1;
+        $visao .= $this->table_open;
+        
         $jobs = $this->Jobs();
-        while ($linha = mysql_fetch_assoc($jobs)) {
+        
+        while ($linha = mysqli_fetch_assoc($jobs)) {
             $paridade += 1;
             $visao .= $this->line_open;
             $campos = array("[titulo]", "[subtitulo]", "[desc]", "[cliente]", "[data]", "[tecnologias]", "[fonte]");
@@ -198,11 +192,112 @@ END;
             }
             $visao .= $this->line_close;
         }
+        
         $visao .= $this->table_close;
         return $visao;
     }
-}
+    
+    /**
+     * Função que retorna o elemento para a chamada side-client
+     * 
+     * @return elemento
+     */
+    public function elemento () {
+        $elemento = "";
+        
+        // bloco aqui
+        
+        return $elemento;
+    }
+    
+    /**
+     * Função que verifica acesso e retorna pagina administrativa para a saida
+     * 
+     * @return admin
+     */
+    public function admin () {
+        if ($this->isAdmin()) {
+            $admin = <<<END
 
+    <div class="panel panel-default">
+        <div class="container-fluid panel-heading">
+            <div class="navbar-header">
+                <a href="/jobs" class="navbar-brand">Área Administrativa</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a href="/jobs/add">Novo Job</a></li>
+                <li><a href="/jobs/edit">Editar Job</a></li>
+            </ul>
+        </div>
+    </div>
+
+END;
+        }
+        return $admin;
+    }
+    
+    private function action () {
+        $path = trim(parse_url(filter_input(INPUT_SERVER, "REQUEST_URI"), PHP_URL_PATH), "/");
+        list($controller, $action, $parameter) = \explode("/", $path, 3);
+
+        if ($controller == "jobs" && $action == "add") {
+            
+        }
+        
+        return $controller;
+    }
+    
+    private function Jobs ($request = 'show', $id = 'all') {
+        $link = $this->dbConnection();
+
+        switch ($request) {
+            case 'show':
+                if ($id == 'all') {
+                    $result = mysqli_query($link, "SELECT * FROM jobs;");
+                } else {
+                    $result = mysqli_query($link, "SELECT * FROM jobs WHERE idjobs = `$id`;");
+                }
+                if (!$result) {
+                    return array('Mensagem' => 'Erro SQL', 'MySQL Error' => mysqli_error($link));
+                }
+                if (mysqli_num_rows($result) == 0) {
+                    return array('Mensagem' => 'Tabela de Jobs vazia', 'MySQL Error' => mysqli_error($link));
+                }
+
+                break;
+            case 'add':
+                
+                break;
+            case 'edit':
+                break;
+            case 'delete':
+                break;
+        }
+        return $result;
+    }
+    
+    /**
+     * Função retorna verdadeiro se a assinatura estiver correta
+     * @return bolean
+     */
+    private function isAdmin() {
+        $isAdmin = false;
+        global $UNIKE_PHRASE;
+        $signature_file = filter_input(INPUT_SERVER, "DOCUMENT_ROOT").'/chaves/assinatura.rsa';
+        if (file_exists($signature_file)) {
+            $file = fopen($signature_file, "r");
+            $key = md5($UNIKE_PHRASE.':'.filter_input(INPUT_SERVER, "REMOTE_ADDR"));
+            if (($key == md5($UNIKE_PHRASE.':'.constant("ADMINLAN_HOST"))) || ($key == fgets($file))) {
+                $isAdmin = true;
+            }
+            fclose($file);
+        } else {
+            // Pedir o upload do arquivo
+        }
+        return $isAdmin;
+    }
+}
+    
 /**
  * Testes
 

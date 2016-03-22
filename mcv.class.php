@@ -20,6 +20,12 @@ class mcv {
             $portfolio->mysql_conn_password = "workbench";
             $this->activeView = $portfolio->visao();
             $portfolio->dbConnectionClose();
+        } else if ($this->controller() == "filterserver") {
+            $saida = "<title>Filter Server</title>";
+            $saida .= "<pre>";
+            $saida .= print_r(filter_input_array(INPUT_SERVER), true);
+            $saida .= "</pre>";
+            $this->activeView = $saida;
         } else if ($this->controller() == "face") {
             header('Location: http://'.$this->views[$this->controller()]);
         } else if ($this->controller() == "processa-velha") {
@@ -44,11 +50,15 @@ class mcv {
         $this->append($this->stylesheets);
         $this->append('</head>');
         $this->append("\r\n\r\n");
+        $this->append("<body>");
+        $this->append("\r\n\r\n");
         $this->append('<div class="container">');
-        if (filter_input(INPUT_SERVER, "HTTP_HOST") == "localhost"){
-            $this->append($this->globalNotice);
+        if (filter_input(INPUT_SERVER, "HTTP_HOST") == "localhost" || filter_input(INPUT_SERVER, "HTTP_HOST") == "192.168.0.6"){
+            if ($this->globalNotice != "") {
+                $this->append($this->globalNotice);
+            }
         }
-        $this->append('<nav class="navbar navbar-inverse"><ul>');
+        $this->append('<nav class="navbar navbar-inverse">');
         $this->append('<div class="container-fluid">');
         $this->append('<div class="navbar-header">');
         $this->append('<a class="navbar-brand" href="/">' . $this->siteName . '</a>');
@@ -67,6 +77,8 @@ class mcv {
         $this->append('<em>Simple Me</em> Theme by <a href="http://www.w3schools.com/bootstrap/default.asp"><img class="" src="http://www.w3schools.com/images/w3schools80x15.gif"></a></p>');
         $this->append('</footer>');
         $this->append('</div>');
+        $this->append("\r\n\r\n");
+        $this->append("</body>");
         $this->append("\r\n\r\n".'</html>'."\r\n");
 
         echo $this->saida;
@@ -101,7 +113,7 @@ class mcv {
     }
     function addNavItem($tag, $caption, $view, $active = false){
         $class = "";
-        if ($active == true) $class = "active";
+        if ($active == true) { $class = "active"; }
         if ($tag == "face"){
             $this->navItems = $this->navItems ."\t".'<li class="'. $class .'"><a href="/'.$tag.'" target="_blank">'.$caption.'</a></li>';
             $this->views[$tag] = $view;
@@ -112,33 +124,35 @@ class mcv {
     }
     function controller(){
         $path = trim(parse_url(filter_input(INPUT_SERVER, "REQUEST_URI"), PHP_URL_PATH), "/");
-        list($controller, $action, $params) = \explode("/", $path, 3);
+        list($controller) = \explode("/", $path, 3);
 
-        if ($controller == "") $controller = "/";
+        if ($controller == "") { $controller = "/"; }
+        
         return $controller;
     }
-    function setGlobalNotice($msg=""){
-        if ($msg == "") {
+    function setGlobalNotice($msg = ""){
+        if ($this->globalNotice == "") {
             $last_error = error_get_last();
-            $errortype = $this->friendlyErrorType();
-            if ($last_error['type'] >= 1) {
-                $msg = '<div class="global-notice">';
+            $notice = '<div class="global-notice">';
+            if ($msg != "") {
+                $notice .= '<div class="alert alert-info"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>' . $msg . '</div>';
+            } elseif ($last_error['type'] >= 1) {
+                $errortype = $this->friendlyErrorType();
                 if ($last_error['type'] == 1) {
-                    $class = "bg-danger";
+                    $notice .= '<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
                 } else {
-                    $class = "bg-warning";
+                    $notice .= '<div class="alert alert-warning"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>';
                 }
-                $msg = $msg . '<div class="alert alert-warning"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'.
-                    "<strong>".ucfirst($errortype[$last_error['type']]).":</strong> ".
-                    $last_error['message'].
+                $notice .= "<strong>" . ucfirst($errortype[$last_error['type']]) . ":</strong> " .
+                    $last_error['message'] .
                     ' in: ' .
-                    "<strong>...".substr($last_error['file'],-20)."</strong>".
+                    "<strong>..." . substr($last_error['file'],-20) . "</strong>" .
                     ' on line: ' .
-                    "<strong>".$last_error['line'].'</strong></div>';
-                $msg = $msg .'</div>';
+                    "<strong>" . $last_error['line'] . '</strong></div>';
             }
+            $notice .= '</div>';
+            $this->globalNotice = $notice;
         }
-        $this->globalNotice = $msg;
     }
     function friendlyErrorType(){
         $errortype = array(
