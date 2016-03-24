@@ -218,8 +218,43 @@ END;
      * @return admin
      */
     public function admin () {
+        $admin = "";
+        /**
+         * Uso da API GitHub via GitHubClient-PHP
+         *
+        require_once __DIR__ . '/clientes/github-php-client/client/GitHubClient.php';
+        $github = new GitHubClient();
+        $github->setCredentials('h4mn-bot', 'foxBOT2016');
+        //$github->setPage();
+        //$github->setPageSize(2);
+        $commits = $github->repos->commits->listCommitsOnRepository('h4mn', 'portfolio');
+        //$commits = $github->repos->commits->listCommitsOnRepository($owner, $repo);
+
+        echo "Count: " . count($commits) . "\n";
+        foreach($commits as $commit)
+        {
+            $admin .= get_class($commit) . " - Sha: " . $commit->getSha() . "\n";
+        }
+        /*
+         * 
+         */
+        /*
+         * Uso da API GitHub via cURL e JSON
+         */
+        $this->curl_request("https://api.github.com -u h4mn-bot:foxBOT2016");
+        //$this->curl_request("https://api.github.com -u h4mn:hamnGH2015");
+        $status = $this->curl_request("https://api.github.com/repos/h4mn/portfolio/commits", "user-agent");
+        /**
+         * 
+         */
+
+        $admin .= '<br>'.$status['response'].'<br>';
+        //$admin .= pre_array($status);
+        //$admin .= $this->pre_array(json_decode($resultado, true));
+
+        $this->action();
         if ($this->isAdmin()) {
-            $admin = <<<END
+            $admin .= <<<END
 
     <div class="panel panel-default">
         <div class="container-fluid panel-heading">
@@ -232,14 +267,7 @@ END;
             </ul>
         </div>
     </div>
-    <div class="panel panel-danger">
-        <div class="panel-heading"><h4>Lição Programação nº2</h4></div>
-        <div class="panel-body">
-            <h4>$this->variavel_do_vinny</h4>
-            <p>Teste de alteração do repositório portfolio no GitHub</p>
-        </div>
-    </div>
-
+    $this->variavel_do_vinny
 END;
         }
         return $admin;
@@ -247,14 +275,31 @@ END;
     
     private function action () {
         $path = trim(parse_url(filter_input(INPUT_SERVER, "REQUEST_URI"), PHP_URL_PATH), "/");
-        list($controller, $action, $parameter) = \explode("/", $path, 3);
+        list($controller, $action, $parameter) = explode("/", $path, 3);
+        if ($parameter) {}
 
         if ($controller == "jobs" && $action == "add") {
             
         }
 
         if ($controller == "jobs" && $action == "githubbing") {
-            $this->variavel_do_vinny = "Vinny esteve aqui e aprendeu a lição.";
+            /**
+             * Início - Easter Egg do Vinny
+             */
+            $this->variavel_do_vinny = <<<END
+
+    <div class="panel panel-danger">
+        <div class="panel-heading"><h4>Lição Programação nº2</h4></div>
+        <div class="panel-body">
+            <h4>Vinny esteve aqui e aprendeu a lição.</h4>
+            <p>Teste de alteração do repositório portfolio no GitHub</p>
+        </div>
+    </div>
+
+END;
+            /**
+             * Fim - Easter Egg do Vinny
+             */
         }
         
         return $controller;
@@ -308,6 +353,28 @@ END;
             // Pedir o upload do arquivo
         }
         return $isAdmin;
+    }
+    public function curl_request($url,$headers = "") {
+        $cURL = curl_init(); // Instancia CURL criada
+        curl_setopt($cURL, CURLOPT_URL, $url); //URL definida
+        curl_setopt($cURL, CURLOPT_RETURNTRANSFER, 1); //Retorna a transferencia em string
+        if ($headers != "") {
+            curl_setopt($cURL, CURLOPT_HEADER, "User-Agent: h4mn-portfolio");
+        }
+        $response = curl_exec($cURL); //Imprimindo a saida
+        $status = curl_getinfo($cURL, CURLINFO_HTTP_CODE); //Verificar status
+        curl_close($cURL); //Fecha a instancia
+        return array(
+            'status' => $status,
+            'response' => $response
+        );
+    }
+    
+    public function pre_array ($msg) {
+        $return = '<pre>';
+        $return .= $msg;
+        $return .= '</pre>';
+        return $return;
     }
 }
     
